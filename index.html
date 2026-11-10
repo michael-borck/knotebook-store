@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101117" />
+    <title>Knotebook Store</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #101117;
+        --panel: #161822;
+        --panel-2: #1c1f2b;
+        --text: #e8e6ef;
+        --muted: #9a97a8;
+        --border: #2a2d3a;
+        --accent: #c084fc;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 22px;
+        border-bottom: 1px solid var(--border);
+        background: var(--panel);
+      }
+      header h1 { margin: 0; font-size: 18px; font-weight: 700; }
+      header h1 span { color: var(--muted); font-weight: 500; }
+      header a {
+        margin-left: auto;
+        color: var(--text);
+        text-decoration: none;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 7px 12px;
+        background: var(--panel-2);
+      }
+      header a:hover { border-color: var(--accent); }
+      main { max-width: 900px; margin: 0 auto; padding: 28px 20px 80px; }
+      .intro { color: var(--muted); margin: 0 0 20px; }
+      .grid {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 14px;
+      }
+      .card {
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 10px;
+        padding: 14px;
+        background: var(--panel);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .theme {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: var(--muted);
+      }
+      .card h2 { margin: 0; font-size: 17px; }
+      .muted { color: var(--muted); margin: 0; font-size: 13px; }
+      .desc { margin: 0; font-size: 13px; }
+      .button {
+        margin-top: auto;
+        display: inline-block;
+        text-align: center;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--panel-2);
+        color: var(--text);
+        text-decoration: none;
+        font-size: 13px;
+      }
+      .button:hover { border-color: var(--accent); }
+      #status { margin-top: 20px; color: var(--muted); font-size: 12px; }
+      code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Knotebook <span>Store</span></h1>
+      <a id="open-player" href="#">Open Player</a>
+    </header>
+    <main>
+      <p class="intro">
+        Packs are self-contained. Install one in the Player, then read offline.
+      </p>
+      <ul id="packs" class="grid"></ul>
+      <p id="status">Loading catalogue…</p>
+    </main>
+    <script>
+      const PLAYER_URL = 'https://michael-borck.github.io/Knotebook/'
+      const CATALOGUE_URL = new URL('catalogue.json', location.href).toString()
+
+      const playerLink = new URL(PLAYER_URL)
+      playerLink.searchParams.set('player', '1')
+      playerLink.searchParams.set('store', CATALOGUE_URL)
+      document.getElementById('open-player').href = playerLink.toString()
+
+      function esc(value) {
+        return String(value).replace(/[&<>"']/g, function (ch) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]
+        })
+      }
+
+      function render(catalogue) {
+        const list = document.getElementById('packs')
+        list.innerHTML = ''
+        for (const pack of catalogue.packs) {
+          const item = document.createElement('li')
+          item.className = 'card'
+          item.innerHTML =
+            '<div class="theme">' + esc(pack.theme) + '</div>' +
+            '<h2>' + esc(pack.title) + '</h2>' +
+            '<p class="muted">' + esc(pack.author || 'Unknown author') + '</p>' +
+            (pack.description ? '<p class="desc">' + esc(pack.description) + '</p>' : '')
+          const link = document.createElement('a')
+          link.className = 'button'
+          link.href = playerLink.toString()
+          link.textContent = 'Install in Player'
+          item.appendChild(link)
+          list.appendChild(item)
+        }
+        const signed = catalogue.publicKey ? 'signed' : 'unsigned'
+        document.getElementById('status').textContent =
+          catalogue.packs.length + ' pack(s) · ' + signed + ' catalogue'
+      }
+
+      fetch(CATALOGUE_URL)
+        .then(function (response) {
+          if (!response.ok) throw new Error('catalogue ' + response.status)
+          return response.json()
+        })
+        .then(render)
+        .catch(function (error) {
+          document.getElementById('status').textContent =
+            'Could not load the catalogue: ' + error.message
+        })
+    </script>
+  </body>
+</html>
