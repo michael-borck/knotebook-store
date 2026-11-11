@@ -124,7 +124,7 @@
           const item = document.createElement('li')
           item.className = 'card'
           item.innerHTML =
-            '<div class="theme">' + esc(pack.theme) + '</div>' +
+            '<div class="theme">' + esc(pack.theme) + (pack.release ? ' · v' + esc(pack.release) : '') + '</div>' +
             '<h2>' + esc(pack.title) + '</h2>' +
             '<p class="muted">' + esc(pack.author || 'Unknown author') + '</p>' +
             (pack.description ? '<p class="desc">' + esc(pack.description) + '</p>' : '')
