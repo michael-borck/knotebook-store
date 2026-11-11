@@ -108,6 +108,7 @@
 
       const playerLink = new URL(PLAYER_URL)
       playerLink.searchParams.set('player', '1')
+      playerLink.searchParams.set('view', 'store')
       playerLink.searchParams.set('store', CATALOGUE_URL)
       document.getElementById('open-player').href = playerLink.toString()
 
