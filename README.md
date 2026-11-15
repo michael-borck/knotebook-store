@@ -1,6 +1,6 @@
 # Knotebook store
 
-Static storefront for [Knotebook](https://github.com/michael-borck/Knotebook) packs.
+Static storefront for [Knotebook](https://github.com/michael-borck/knotebook) packs.
 No backend. `catalogue.json` and the packs are served as static files.
 
 ## What lives here
