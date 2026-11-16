@@ -9,6 +9,7 @@ No backend. `catalogue.json` and the packs are served as static files.
 catalogue.json           signed list of packs (hashes + signatures)
 packs/*.knotebook.json   the packs themselves
 index.html               storefront
+style.css, app.js        storefront assets
 scripts/verify-store.mjs hash + signature check used by CI
 ```
 
@@ -35,7 +36,8 @@ node scripts/verify-store.mjs
 ```
 
 CI runs this before deploying. It checks every pack's SHA-256 and, when the
-catalogue has a `publicKey`, its Ed25519 signature.
+catalogue has a `publicKey`, its Ed25519 signature. It also checks the catalogue
+version, pack metadata, data-URL assets, and the 16 MB pack limit.
 
 ## Deploy
 
@@ -50,4 +52,7 @@ catalogue has a `publicKey`, its Ed25519 signature.
 <player-url>?player=1&store=<absolute catalogue URL>
 ```
 
-Set `PLAYER_URL` in `index.html` if the app is hosted elsewhere.
+Set `PLAYER_URL` in `app.js` if the app is hosted elsewhere.
+
+The storefront has a theme filter bar and a strict CSP; its script and styles are
+external files (`app.js`, `style.css`).
